@@ -208,6 +208,58 @@ async function run() {
       }
     });
 
+    app.post("/api/joined-events", verifyToken, async (req, res) => {
+      const joinedEventData = req.body;
+      const userEmail = req.user.email;
+
+      if (joinedEventData.userEmail !== userEmail) {
+        return res.status(403).send({ message: "Forbidden. Email mismatch." });
+      }
+
+      try {
+        const existingEntry = await joinedEventCollection.findOne({
+          eventId: joinedEventData.eventId,
+          userEmail: userEmail,
+        });
+
+        if (existingEntry) {
+          return res.send({ message: "You have already joined this event." });
+        }
+
+        const result = await joinedEventCollection.insertOne(joinedEventData);
+        res.send(result);
+      } catch (error) {
+        console.error("Error joining event:", error);
+        res.status(500).send({ message: "Failed to join event" });
+      }
+    });
+
+    app.get("/api/joined-events", verifyToken, async (req, res) => {
+      const userEmail = req.query.email;
+      const tokenEmail = req.user.email;
+
+      if (userEmail !== tokenEmail) {
+        return res
+          .status(403)
+          .send({ message: "Forbidden access. Email does not match token." });
+      }
+
+      const query = { userEmail: userEmail };
+      const options = {
+        sort: { eventDate: 1 },
+      };
+
+      try {
+        const events = await joinedEventCollection
+          .find(query, options)
+          .toArray();
+        res.send(events);
+      } catch (error) {
+        console.error("Error fetching joined events:", error);
+        res.status(500).send({ message: "Failed to fetch joined events" });
+      }
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"

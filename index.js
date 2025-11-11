@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.your-cluster-uri.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@b12-a10-future-box-serv.asxjjou.mongodb.net/?appName=b12-a10-future-box-server`;
 
 const client = new MongoClient(uri, {
   serverApi: {

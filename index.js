@@ -4,7 +4,10 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const admin = require("firebase-admin");
 
-const serviceAccount = require("./serviceAccountKey.json");
+const decoded = Buffer.from(process.env.FB_SERVICE_KEY, "base64").toString(
+  "utf8"
+);
+const serviceAccount = JSON.parse(decoded);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -230,7 +233,7 @@ async function run() {
         res.send(result);
       } catch (error) {
         console.error("Error joining event:", error);
-        res.status(500).send({ message: "Failed to join event" });
+        res.status(500).send({ message: "Failed to create event" });
       }
     });
 

@@ -102,22 +102,22 @@ async function run() {
       }
     });
 
-  app.post("/api/events", verifyToken, async (req, res) => {
-    const eventData = req.body;
-    const userEmail = req.user.email;
+    app.post("/api/events", verifyToken, async (req, res) => {
+      const eventData = req.body;
+      const userEmail = req.user.email;
 
-    if (eventData.creatorEmail !== userEmail) {
-      return res.status(403).send({ message: "Forbidden. Email mismatch." });
-    }
+      if (eventData.creatorEmail !== userEmail) {
+        return res.status(403).send({ message: "Forbidden. Email mismatch." });
+      }
 
-    try {
-      const result = await eventCollection.insertOne(eventData);
-      res.send(result);
-    } catch (error) {
-      console.error("Error creating event:", error);
-      res.status(500).send({ message: "Failed to create event" });
-    }
-  });
+      try {
+        const result = await eventCollection.insertOne(eventData);
+        res.send(result);
+      } catch (error) {
+        console.error("Error creating event:", error);
+        res.status(500).send({ message: "Failed to create event" });
+      }
+    });
 
     app.get("/api/my-events", verifyToken, async (req, res) => {
       const userEmail = req.query.email;
@@ -259,7 +259,7 @@ async function run() {
         res.send(events);
       } catch (error) {
         console.error("Error fetching joined events:", error);
-        res.status(500).json({ message: "Failed to fetch joined events" });
+        res.status(500).send({ message: "Failed to fetch joined events" });
       }
     });
 
@@ -268,10 +268,9 @@ async function run() {
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
   } finally {
-  
   }
 }
-run().catch(console.log);
+run().catch(console.dir);
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
